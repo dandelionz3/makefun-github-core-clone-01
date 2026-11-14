@@ -12,7 +12,7 @@ let idCounter=1;
 const hash=(s:string)=>createHash('sha1').update(s).digest('hex');
 const JSON_TYPE='application/json; charset=utf-8';
 function json(res:ServerResponse,status:number,body:unknown,headers:Obj={}){const data=JSON.stringify(body);res.writeHead(status,{'content-type':JSON_TYPE,'content-length':Buffer.byteLength(data),'x-github-request-id':hash(`${status}:${data}`).slice(0,16),...headers});res.end(data)}
-function pathOf(req:IncomingMessage){try{return new URL(req.url??'/','http://x')}catch{return new URL('http://x/')}}
+function pathOf(req:IncomingMessage){const origin=`http://${req.headers.host||'127.0.0.1'}`;try{return new URL(req.url??'/',origin)}catch{return new URL('/',origin)}}
 async function rawBody(req:IncomingMessage):Promise<Buffer>{const chunks=[];for await(const c of req)chunks.push(c);return Buffer.concat(chunks)}
 function parseJson(raw:Buffer):any{if(!raw.length)return {};try{return JSON.parse(raw.toString())}catch{throw new Error('BAD_JSON')}}
 function mkRepo(owner:string,name:string,b:any={}):Repo{return {owner,name,description:b.description??'',private:b.private??false,default_branch:b.default_branch||'main',files:new Map(),issues:[],pulls:[],labels:new Set(),branches:new Map(),tags:new Map(),objects:new Map(),commits:[],deleted:false}}
