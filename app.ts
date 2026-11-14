@@ -1,7 +1,7 @@
 import { createServer, type IncomingMessage, type Server, type ServerResponse } from 'node:http';
 import { createHash } from 'node:crypto';
 import { scenario } from './scenario.ts';
-import { buildTree, encodePktLine, encodePktLines, hashObject, parseCommit, parseTree, readPack, writePack, type GitObjectInput, type GitObject } from './gitpack.ts';
+import { buildTree, decodePktLines, encodePktLine, encodePktLines, hashObject, parseCommit, parseTree, readPack, writePack, type GitObjectInput, type GitObject } from './gitpack.ts';
 
 type Obj = Record<string, any>;
 type Repo = {owner:string;name:string;description:string;private:boolean;default_branch:string;files:Map<string,{content:string;sha:string}>;issues:Obj[];pulls:Obj[];labels:Set<string>;branches:Map<string,string>;tags:Map<string,string>;objects:Map<string,GitObject>;commits:Obj[]; deleted:boolean};
@@ -10,6 +10,7 @@ const token = process.env.MAKEFUN_SHOP_TOKEN ?? '';
 const login = scenario.viewer.login;
 let idCounter=1;
 const hash=(s:string)=>createHash('sha1').update(s).digest('hex');
+const pkt=encodePktLine;
 const JSON_TYPE='application/json; charset=utf-8';
 function json(res:ServerResponse,status:number,body:unknown,headers:Obj={}){const data=JSON.stringify(body);res.writeHead(status,{'content-type':JSON_TYPE,'content-length':Buffer.byteLength(data),'x-github-request-id':hash(`${status}:${data}`).slice(0,16),...headers});res.end(data)}
 function pathOf(req:IncomingMessage){try{return new URL(req.url??'/','http://x')}catch{return new URL('http://x/')}}
