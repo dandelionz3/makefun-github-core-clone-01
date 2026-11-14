@@ -10,7 +10,6 @@ const token = process.env.MAKEFUN_SHOP_TOKEN ?? '';
 const login = scenario.viewer.login;
 let idCounter=1;
 const hash=(s:string)=>createHash('sha1').update(s).digest('hex');
-const pkt=encodePktLine;
 const JSON_TYPE='application/json; charset=utf-8';
 function json(res:ServerResponse,status:number,body:unknown,headers:Obj={}){const data=JSON.stringify(body);res.writeHead(status,{'content-type':JSON_TYPE,'content-length':Buffer.byteLength(data),'x-github-request-id':hash(`${status}:${data}`).slice(0,16),...headers});res.end(data)}
 function pathOf(req:IncomingMessage){try{return new URL(req.url??'/','http://x')}catch{return new URL('http://x/')}}
